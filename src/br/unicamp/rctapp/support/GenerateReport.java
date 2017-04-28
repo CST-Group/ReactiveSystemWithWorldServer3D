@@ -69,15 +69,46 @@ public class GenerateReport {
             List<XYSeries> xySeries =  xySeriesCollection.getSeries();
             List<XYSeries> foundSerie = xySeries.stream().filter(xy -> xy.getKey().equals(result.variableName)).collect(Collectors.toList());
             if(foundSerie.size() > 0){
-                foundSerie.get(0).add((double)result.x, ((double)result.y));
+                if (title.contains("Leaflet"))
+                    foundSerie.get(0).add((double)result.x, ((double)result.y) * 100);
+                else
+                    foundSerie.get(0).add((double)result.x, ((double)result.y));
             }
             else{
                 XYSeries serie = new XYSeries(result.variableName);
-                serie.add((double)result.x, ((double)result.y));
+
+                if (title.contains("Leaflet"))
+                    serie.add((double)result.x, ((double)result.y) * 100);
+                else
+                    serie.add((double)result.x, ((double)result.y));
+
                 xySeriesCollection.addSeries(serie);
             }
 
         });
+
+        XYSeries experimentAverage = new XYSeries("Experiments' Average");
+
+
+        for (double i=1; i <= 900; i++){
+
+            double finalI = i;
+
+            List<Result> timeResult = graph.results.stream().filter(result -> ((double)result.x) == finalI).collect(Collectors.toList());
+
+            final double[] meanY = {0};
+
+            timeResult.stream().forEach(result -> {
+                if (title.contains("Leaflet"))
+                    meanY[0] += (double)result.y * 100;
+                else
+                    meanY[0] += (double)result.y;
+            });
+
+            experimentAverage.add(i, meanY[0]/timeResult.size());
+        }
+
+        xySeriesCollection.addSeries(experimentAverage);
 
         final JFreeChart chart = ChartFactory.createXYLineChart(
                 title,

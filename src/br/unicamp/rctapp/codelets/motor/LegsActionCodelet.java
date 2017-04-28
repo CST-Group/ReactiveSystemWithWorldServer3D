@@ -1,6 +1,5 @@
 package br.unicamp.rctapp.codelets.motor;
 
-import br.unicamp.cst.core.entities.MemoryContainer;
 import br.unicamp.cst.core.entities.MemoryObject;
 import org.json.JSONObject;
 

@@ -27,16 +27,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import br.unicamp.cst.motivational.Drive;
-import br.unicamp.cst.motivational.MotivationalCodelet;
 import br.unicamp.rctapp.application.AgentMind;
 import br.unicamp.rctapp.memory.CreatureInnerSense;
 import com.google.gson.Gson;
 import ws3dproxy.model.Creature;
 import ws3dproxy.model.World;
-import ws3dproxy.util.Constants;
+
 
 class MVTimerTask extends TimerTask {
     MindView mv;
@@ -99,7 +95,7 @@ public class MindView extends javax.swing.JFrame {
     private CreatureInnerSense creatureInnerSense;
     private Date initDate;
 
-    private int defaultTime = 20;
+    private int defaultTime = 15;
 
     private File fileEnergySpent;
     private File fileCreatureScore;
@@ -182,7 +178,6 @@ public class MindView extends javax.swing.JFrame {
                     time+=1;
 
                     reportEnergySpent(time);
-                    reportDrivesActivation(time);
                     reportCreatureScore(time);
 
                     try {
@@ -251,15 +246,6 @@ public class MindView extends javax.swing.JFrame {
 
     private void reportEnergySpent(double time) {
         this.getResultEnergySpent().add(new Result("Energy Spent", time, creature.getFuel()));
-    }
-
-    private void reportDrivesActivation(double time) {
-        List<MemoryObject> drivesMO = mol.stream().filter(d -> d.getName() == MotivationalCodelet.OUTPUT_DRIVE_MEMORY).collect(Collectors.toList());
-        drivesMO.stream().forEach(driveMO -> {
-            if(driveMO.getI() != null) {
-                this.getResultDrivesActivation().add(new Result(((Drive) (driveMO.getI())).getName(), time, driveMO.getEvaluation()));
-            }
-        });
     }
 
     private void reportCreatureScore(double time) {
