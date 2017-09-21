@@ -4,6 +4,7 @@ import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import br.unicamp.cst.core.exceptions.CodeletActivationBoundsException;
@@ -19,23 +20,27 @@ public class Vision extends Codelet {
     private Creature c;
 
 
-    public Vision(Creature nc) {
-        this.c = nc;
+    public Vision(String name, Creature nc) {
+        this.setName(name);
+        this.setC(nc);
     }
 
     @Override
     public void accessMemoryObjects() {
-        visionMO = (MemoryObject) this.getOutput("VISION");
+        if (getVisionMO() == null) {
+            setVisionMO((MemoryObject) this.getOutput("VISION"));
+        }
     }
 
     @Override
     public void proc() {
-        c.updateState();
-        synchronized (visionMO) {
-            List<Thing> lt = new ArrayList<>();
-            lt.addAll(c.getThingsInVision());
-            visionMO.setI(lt);
-        }
+
+        getC().updateState();
+        List<Thing> lt = Collections.synchronizedList(new ArrayList<>());
+        lt.addAll(getC().getThingsInVision());
+        getVisionMO().setI(lt);
+
+
     }
 
     @Override
@@ -47,6 +52,22 @@ public class Vision extends Codelet {
         }
     }
 
+
+    public MemoryObject getVisionMO() {
+        return visionMO;
+    }
+
+    public void setVisionMO(MemoryObject visionMO) {
+        this.visionMO = visionMO;
+    }
+
+    public Creature getC() {
+        return c;
+    }
+
+    public void setC(Creature c) {
+        this.c = c;
+    }
 
 }
 

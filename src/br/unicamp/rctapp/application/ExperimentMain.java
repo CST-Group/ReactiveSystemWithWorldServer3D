@@ -9,12 +9,18 @@ import java.util.logging.Logger;
 public class ExperimentMain {
 
 
-    public Logger logger = Logger.getLogger(ExperimentMain.class.getName());
 
 
     public ExperimentMain() {
         //WS3DProxy.logger.setLevel(Level.SEVERE);
-        Logger.getLogger("br/unicamp/rctapp/codelets").setLevel(Level.SEVERE);
+        //Logger.getLogger("br/unicamp/mtwsapp/codelets").setLevel(Level.SEVERE);
+        Logger.getLogger("ac.biu.nlp.nlp.engineml").setLevel(Level.OFF);
+        Logger.getLogger("org.BIU.utils.logging.ExperimentLogger").setLevel(Level.OFF);
+        Logger.getLogger("java.awt").setLevel(Level.OFF);
+        Logger.getLogger("sun.awt").setLevel(Level.OFF);
+        Logger.getLogger("javax.swing").setLevel(Level.OFF);
+
+
         // Create Environment
         Environment env = new Environment(); //Creates only a creature and some apples
         AgentMind a = new AgentMind(env);  // Creates the Agent Mind and start it
@@ -30,3 +36,4 @@ public class ExperimentMain {
     }
 
 }
+

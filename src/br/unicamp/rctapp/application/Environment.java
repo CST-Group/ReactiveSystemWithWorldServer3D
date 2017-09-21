@@ -35,6 +35,9 @@ public class Environment {
             World.createJewel(rand.nextInt(6), rand.nextInt(width), rand.nextInt(height));
             World.createJewel(rand.nextInt(6), rand.nextInt(width), rand.nextInt(height));
 
+
+            //World.createJewel(5, rand.nextInt(width), rand.nextInt(height));
+
             int x = rand.nextInt(width);
             int y = rand.nextInt(height);
             World.createBrick(4, x, y, x + 40, y + 40);
@@ -65,3 +68,4 @@ public class Environment {
 
     }
 }
+

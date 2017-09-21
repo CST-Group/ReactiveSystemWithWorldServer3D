@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import br.unicamp.rctapp.memory.CreatureInnerSense;
-import br.unicamp.rctapp.support.MindView;
 import ws3dproxy.model.Thing;
 
 /**
@@ -81,7 +80,6 @@ public class AgentMind extends Mind {
 
         hiddenObjetecsMO = createMemoryObject("HIDDEN_THINGS");
         hiddenObjetecsMO.setI(Collections.synchronizedList(new ArrayList<Thing>()));
-
 
 
         // Create Sensor Codelets
@@ -201,7 +199,7 @@ public class AgentMind extends Mind {
 
 
         // Create and Populate MindViewer
-        MindView mv = new MindView("MindView");
+        /*MindView mv = new MindView("MindView");
 
         mv.setCreatureInnerSense(cis);
         mv.setCreature(env.c);
@@ -218,7 +216,7 @@ public class AgentMind extends Mind {
         mv.addMO(closestObstacleMO);
 
         mv.StartTimer();
-        mv.setVisible(true);
+        mv.setVisible(true);*/
 
 
         // Start Cognitive Cycle

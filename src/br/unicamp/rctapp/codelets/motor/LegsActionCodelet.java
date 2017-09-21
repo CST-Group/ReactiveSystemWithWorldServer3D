@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 import br.unicamp.cst.core.entities.Codelet;
 
-import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
 import org.json.JSONException;
 import ws3dproxy.CommandExecException;
 import ws3dproxy.model.Creature;
-import ws3dproxy.model.Thing;
 
 /**
  * @author Du
@@ -27,26 +25,36 @@ public class LegsActionCodelet extends Codelet {
     private String previousLegsAction = "";
     private Creature c;
     private double rotation = 0.01;
+    private double previousPositionX = 0d;
+    private double previousPositionY = 0d;
 
-    int k = 0;
-    static Logger log = Logger.getLogger(LegsActionCodelet.class.getCanonicalName());
+    private int k = 0;
+    private static Logger log = Logger.getLogger(LegsActionCodelet.class.getCanonicalName());
 
     public LegsActionCodelet(Creature nc) {
-        c = nc;
+        setC(nc);
+    }
+
+    public static Logger getLog() {
+        return log;
+    }
+
+    public static void setLog(Logger log) {
+        LegsActionCodelet.log = log;
     }
 
     @Override
     public void accessMemoryObjects() {
-        if (legsMO == null)
-            legsMO = (MemoryObject) this.getInput("LEGS");
+        if (getLegsMO() == null)
+            setLegsMO((MemoryObject) this.getInput("LEGS"));
 
     }
 
     @Override
     public void proc() {
 
-        synchronized (legsMO) {
-            String comm = (String) legsMO.getI();
+        synchronized (getLegsMO()) {
+            String comm = (String) getLegsMO().getI();
             if (comm == null)
                 comm = "";
 
@@ -56,87 +64,112 @@ public class LegsActionCodelet extends Codelet {
                     if (command.has("ACTION")) {
                         int x = 0, y = 0;
                         String action = command.getString("ACTION");
+
+                        if (action.equals("RANDOM")
+                                && getPreviousLegsAction().contains("RANDOM")
+                                && getC().getPosition().getX() == previousPositionX
+                                && getC().getPosition().getY() == previousPositionY) {
+                            action = "AVOID";
+                        }
+
                         if (action.equals("FORAGE")) {
-                            //if (!comm.equals(previousLegsAction)) {
-                            if (!comm.equals(previousLegsAction))
-                                log.info("Sending FORAGE command to agent");
-                            try {
-                                c.rotate(rotation);
-                                //c.move(0,0, rotation);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            if (!getPreviousLegsAction().contains(action)) {
+                                getLog().info("Sending FORAGE command to agent");
+                                try {
+                                    //getC().move(0, 0, getRotation());
+                                    getC().rotate(getRotation());
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         } else if (action.equals("GOTO")) {
-                            rotation = rotation == 0.01 ? -0.01 : 0.01;
-                            if (!comm.equals(previousLegsAction)) {
+                            setRotation(getRotation() == 3 ? -3 : 3);
+                            if (!comm.equals(getPreviousLegsAction())) {
                                 double speed = command.getDouble("SPEED");
                                 double targetx = command.getDouble("X");
                                 double targety = command.getDouble("Y");
-                                log.info("Sending MOVE command to agent: [" + targetx + "," + targety + "]");
+                                getLog().info("Sending MOVE command to agent: [" + targetx + "," + targety + "]");
 
                                 try {
-                                    c.moveto(speed, targetx, targety);
+
+                                    getC().moveto(speed, targetx, targety);
+
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
 
                         }  else if (action.equals("RANDOM")) {
-                            if (!comm.equals(previousLegsAction)) {
-                                rotation = rotation == 0.01 ? -0.01 : 0.01;
+                            if (!comm.equals(getPreviousLegsAction())) {
+                                setRotation(getRotation() == 3 ? -3 : 3);
                                 double speed = command.getDouble("SPEED");
                                 double targetx = command.getDouble("X");
                                 double targety = command.getDouble("Y");
 
-                                log.info("Sending RANDOM command to agent: [" + targetx + "," + targety + "]");
+                                getLog().info("Sending RANDOM command to agent: [" + targetx + "," + targety + "]");
 
-                                c.moveto(speed, targetx, targety);
+                                previousPositionX = getC().getPosition().getX();
+                                previousPositionY = getC().getPosition().getY();
+
+                                getC().moveto(speed, targetx, targety);
+
                                 try {
-                                    Thread.sleep(200);
+                                    Thread.sleep(400);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
+
+                                getC().moveto(0, 0, 0);
+                                getC().rotate(getRotation());
                             }
 
                         } else if (action.equals("AVOID")) {
 
-                            if (!comm.equals(previousLegsAction)) {
-                                rotation = rotation == 0.01 ? -0.01 : 0.01;
-                                Random rand = new Random();
-                                int random = rand.nextInt(2);
-                                double angle = randomAngle(random);
+                            setRotation(getRotation() == 3 ? -3 : 3);
+                            Random rand = new Random();
+                            int random = rand.nextInt(2);
+                            double angle = randomAngle(random);
 
-                                log.info("Sending AVOID command to agent: [" + angle + "]");
+                            getLog().info("Sending AVOID command to agent: [" + angle + "]");
 
-                                c.move(-3, -3, c.getPitch());
+                            getC().move(-3, -3, getC().getPitch());
 
-                                try {
-                                    Thread.sleep(500);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                                c.move(3, 3, angle);
-
-                                try {
-                                    Thread.sleep(500);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
 
-                        } else {
-                            rotation = rotation == 0.01 ? -0.01 : 0.01;
-                            log.info("Sending STOP command to agent");
+                            getC().rotate(3);
+
                             try {
-                                c.moveto(0, 0, 0);
+                                Thread.sleep(400);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            getC().move(3, 3, angle);
+
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            getC().rotate(getRotation());
+
+                        } else {
+                            setRotation(getRotation() == 0.01 ? -0.01 : 0.01);
+                            getLog().info("Sending STOP command to agent");
+                            try {
+                                getC().moveto(0, 0, 0);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
-                    previousLegsAction = comm;
-                    k++;
+                    setPreviousLegsAction(comm);
+                    setK(getK() + 1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (CommandExecException ex) {
@@ -149,9 +182,9 @@ public class LegsActionCodelet extends Codelet {
 
     private double randomAngle(int random) {
         if (random == 1) {
-            return (c.getPitch() + Math.toRadians(-90));
+            return (getC().getPitch() + Math.toRadians(-90));
         } else {
-            return (c.getPitch() + Math.toRadians(90));
+            return (getC().getPitch() + Math.toRadians(90));
         }
     }
 
@@ -171,4 +204,43 @@ public class LegsActionCodelet extends Codelet {
     }
 
 
+    public MemoryObject getLegsMO() {
+        return legsMO;
+    }
+
+    public void setLegsMO(MemoryObject legsMO) {
+        this.legsMO = legsMO;
+    }
+
+    public String getPreviousLegsAction() {
+        return previousLegsAction;
+    }
+
+    public void setPreviousLegsAction(String previousLegsAction) {
+        this.previousLegsAction = previousLegsAction;
+    }
+
+    public Creature getC() {
+        return c;
+    }
+
+    public void setC(Creature c) {
+        this.c = c;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    public void setK(int k) {
+        this.k = k;
+    }
 }

@@ -69,23 +69,16 @@ public class GenerateReport {
             List<XYSeries> xySeries =  xySeriesCollection.getSeries();
             List<XYSeries> foundSerie = xySeries.stream().filter(xy -> xy.getKey().equals(result.variableName)).collect(Collectors.toList());
             if(foundSerie.size() > 0){
-                if (title.contains("Leaflet"))
-                    foundSerie.get(0).add((double)result.x, ((double)result.y) * 100);
-                else
-                    foundSerie.get(0).add((double)result.x, ((double)result.y));
+                foundSerie.get(0).add((double)result.x, (double)result.y);
             }
             else{
                 XYSeries serie = new XYSeries(result.variableName);
-
-                if (title.contains("Leaflet"))
-                    serie.add((double)result.x, ((double)result.y) * 100);
-                else
-                    serie.add((double)result.x, ((double)result.y));
-
+                serie.add((double)result.x, (double)result.y);
                 xySeriesCollection.addSeries(serie);
             }
 
         });
+
 
         XYSeries experimentAverage = new XYSeries("Experiments' Average");
 
@@ -99,16 +92,15 @@ public class GenerateReport {
             final double[] meanY = {0};
 
             timeResult.stream().forEach(result -> {
-                if (title.contains("Leaflet"))
-                    meanY[0] += (double)result.y * 100;
-                else
-                    meanY[0] += (double)result.y;
+                meanY[0] += (double)result.y;
+
             });
 
             experimentAverage.add(i, meanY[0]/timeResult.size());
         }
 
         xySeriesCollection.addSeries(experimentAverage);
+
 
         final JFreeChart chart = ChartFactory.createXYLineChart(
                 title,
@@ -121,11 +113,17 @@ public class GenerateReport {
                 false
         );
 
+        //TimeSeries dataset3 = MovingAverage.createMovingAverage(t1, "LT", 49, 49);
+
+        //XYDataset experimentAverage = MovingAverage.createMovingAverage(xySeriesCollection, "Experiment Average", 50, 0);
+
+
         XYPlot xyPlot = (XYPlot) chart.getPlot();
+        //xyPlot.setDataset(0, experimentAverage);
         xyPlot.setDomainCrosshairVisible(true);
         xyPlot.setRangeCrosshairVisible(true);
         XYLineAndShapeRenderer xyLineAndShapeRenderer = (XYLineAndShapeRenderer)xyPlot.getRenderer();
-        xyLineAndShapeRenderer.setBaseShapesVisible(true);
+        xyLineAndShapeRenderer.setBaseShapesVisible(false);
 
         Font font3 = new Font("Dialog", Font.PLAIN, 20);
         xyPlot.getDomainAxis().setLabelFont(font3);
