@@ -48,43 +48,42 @@ public class ClosestObstacleDetector extends Codelet {
 
     @Override
     public synchronized void proc() {
+
+        boolean isFound = false;
+
         Thing closest_obstacle = null;
         setKnown(Collections.synchronizedList((List<Thing>) getVisionMO().getI()));
         //closestObstacleMO.setI(closest_obstacle);
 
         synchronized (getKnown()) {
             if (!getKnown().isEmpty()) {
-                //Iterate over objects in vision, looking for the closest apple
+
                 CopyOnWriteArrayList<Thing> myknown = new CopyOnWriteArrayList<>(getKnown());
+
                 for (Thing t : myknown) {
 
-                    String objectName = t.getName();
-
-                    if(objectName.contains("Brick")) {
-                        if (isNear(t, getReachDistance()) != null) {
-                            closest_obstacle = isNear(t, getReachDistance());
+                    if (t.getName().contains("DeliverySpot")) {
+                        double distanceTo = getCreature().calculateDistanceTo(t);
+                        if (distanceTo <= (reachDistance + 25)) {
+                            getClosestObstacleMO().setI(t);
+                            isFound = true;
+                            break;
+                        }
+                    } else {
+                        if (isNear(t, reachDistance) != null) {
+                            getClosestObstacleMO().setI(t);
+                            isFound = true;
+                            break;
                         }
                     }
-                    else{
-                        if (isNear(t, 65) != null) {
-                            closest_obstacle = isNear(t, 65);
-                        }
-                    }
+
                 }
 
-                if (closest_obstacle != null) {
-                    if (getClosestObstacleMO().getI() == null || !getClosestObstacleMO().getI().equals(closest_obstacle)) {
-                        getClosestObstacleMO().setI(closest_obstacle);
-                    }
+                if (isFound == false)
+                    getClosestObstacleMO().setI(null);
 
-                } else {
-
-                    closest_obstacle = null;
-                    getClosestObstacleMO().setI(closest_obstacle);
-                }
             } else {
-                closest_obstacle = null;
-                getClosestObstacleMO().setI(closest_obstacle);
+                getClosestObstacleMO().setI(null);
             }
         }
     }//end proc

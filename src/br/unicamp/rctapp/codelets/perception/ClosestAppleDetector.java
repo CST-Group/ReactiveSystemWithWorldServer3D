@@ -128,7 +128,4 @@ public class ClosestAppleDetector extends Codelet {
     public Creature getCreature() {
         return creature;
     }
-
-
-
 }

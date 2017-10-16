@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ws3dproxy.model.Leaflet;
+import ws3dproxy.model.Thing;
 import ws3dproxy.model.WorldPoint;
 
 /**
@@ -13,20 +14,22 @@ import ws3dproxy.model.WorldPoint;
  */
 public class CreatureInnerSense {
     private WorldPoint position;
+    private WorldPoint deliverySpotPosition;
     private double pitch;
     private double fuel;
     private Polygon fov;
     private List<Leaflet> leafletList;
     private double score;
     private double leafletCompleteRate;
-    private HashMap<String, Double> diffJewels;
+    private HashMap<String,Double> diffJewels;
+    private List<Thing> thingsInWorld;
 
     public String toString() {
+
         if (getPosition() != null)
             return("Position: ["+(int) getPosition().getX()+","+(int) getPosition().getY()+"] Pitch: ["+ getPitch() +"] Fuel: ["+ getFuel()+"] Leaflet Complete Rate: ["+ getLeafletCompleteRate() +"] Score: ["+getScore()+"]");
         else
             return("Position: [null,null] "+" Pitch: ["+ getPitch() +"] Fuel: ["+ getFuel()+"]");
-
 
     }
 
@@ -86,12 +89,28 @@ public class CreatureInnerSense {
         this.leafletCompleteRate = leafletCompleteRate;
     }
 
+    public void setDiffJewels(HashMap<String,Double> diffJewels) {
+        this.diffJewels = diffJewels;
+    }
+
     public HashMap<String, Double> getDiffJewels() {
         return diffJewels;
     }
 
-    public void setDiffJewels(HashMap<String, Double> diffJewels) {
-        this.diffJewels = diffJewels;
+    public List<Thing> getThingsInWorld() {
+        return thingsInWorld;
+    }
+
+    public void setThingsInWorld(List<Thing> thingsInWorld) {
+        this.thingsInWorld = thingsInWorld;
+    }
+
+    public WorldPoint getDeliverySpotPosition() {
+        return deliverySpotPosition;
+    }
+
+    public void setDeliverySpotPosition(WorldPoint deliverySpotPosition) {
+        this.deliverySpotPosition = deliverySpotPosition;
     }
 }
 

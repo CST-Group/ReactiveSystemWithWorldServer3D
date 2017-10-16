@@ -33,7 +33,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author rgudwin
@@ -50,7 +49,7 @@ public class SimulationController {
     private MemoryObject creatureInnerSenseMO;
     private Date initDate;
 
-    private int defaultTime = 15;
+    private int defaultTime = 10;
     private double time = 0;
     private int counterToGenerateThings = 0;
 
@@ -71,7 +70,7 @@ public class SimulationController {
         setResultCreatureScore(new ArrayList<>());
         setR(new Random());
         setFileEnergySpent(new File("reportFiles/ReactiveSystem_EnergySpent" + timeLog + ".txt"));
-        setFileCreatureScore(new File("reportFiles/ReactiveSystem_FeafletComplete" + timeLog + ".txt"));
+        setFileCreatureScore(new File("reportFiles/ReactiveSystem_Score" + timeLog + ".txt"));
         setInitDate(new Date());
 
     }
@@ -110,7 +109,7 @@ public class SimulationController {
 
         if((getTime() /60) == getDefaultTime()){
             finalizeReport("Creature's Energy", "Time", "Energy", getResultEnergySpent(), getFileEnergySpent());
-            finalizeReport("Creature's Leaflet", "Time", "Jewels Collected (%)", getResultCreatureScore(), getFileCreatureScore());
+            finalizeReport("Creature's Score", "Time", "Score", getResultCreatureScore(), getFileCreatureScore());
             getT().cancel();
             getT().purge();
             getAgentMind().shutDown();
@@ -149,7 +148,7 @@ public class SimulationController {
     }
 
     private void reportCreatureScore(double time) {
-        this.getResultCreatureScore().add(new Result("Percentage of Jewelry Collected", time, ((CreatureInnerSense)getCreatureInnerSenseMO().getI()).getLeafletCompleteRate()));
+        this.getResultCreatureScore().add(new Result("Score Obtained", time, ((CreatureInnerSense)getCreatureInnerSenseMO().getI()).getScore()));
     }
 
     private void finalizeReport(String graphName, String xTitle, String yTitle, List<Result> results, File file) {
@@ -173,10 +172,7 @@ public class SimulationController {
                 e.printStackTrace();
             }
         }
-
-
     }
-
 
     public List<Result> getResultEnergySpent() {
         return resultEnergySpent;

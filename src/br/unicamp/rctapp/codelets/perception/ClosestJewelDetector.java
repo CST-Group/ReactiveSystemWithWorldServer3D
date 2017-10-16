@@ -129,6 +129,4 @@ public class ClosestJewelDetector extends Codelet {
     public Creature getCreature() {
         return creature;
     }
-
-
 }

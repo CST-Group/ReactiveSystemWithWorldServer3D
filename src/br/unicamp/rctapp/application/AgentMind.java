@@ -51,8 +51,8 @@ public class AgentMind extends Mind {
         MemoryObject closestObstacleMO;
         MemoryObject hiddenObjetecsMO;
 
-        int reachDistance = 65;
-        int brickDistance = 40;
+        int reachDistance = 60;
+        int brickDistance = 48;
 
         SubsumptionArchitecture subsumptionArchitecture = new SubsumptionArchitecture(this);
 
@@ -83,7 +83,7 @@ public class AgentMind extends Mind {
 
 
         // Create Sensor Codelets
-        Codelet vision = new Vision(env.c);
+        Codelet vision = new Vision("VisionCodelet", env.c);
         vision.addOutput(visionMO);
         insertCodelet(vision); //Creates a vision sensor
 
@@ -103,31 +103,31 @@ public class AgentMind extends Mind {
         insertCodelet(hands);
 
         // Create Perception Codelets
-        Codelet ad = new AppleDetector(env.c);
+        Codelet ad = new AppleDetector("AppleDetectorCodelet", env.c);
         ad.addInput(visionMO);
         ad.addInput(hiddenObjetecsMO);
         ad.addOutput(knownApplesMO);
         insertCodelet(ad);
 
-        Codelet closestAppleDetector = new ClosestAppleDetector(env.c, reachDistance);
+        Codelet closestAppleDetector = new ClosestAppleDetector("ClosestAppleDetectorCodelet", env.c, reachDistance);
         closestAppleDetector.addInput(knownApplesMO);
         closestAppleDetector.addInput(innerSenseMO);
         closestAppleDetector.addOutput(closestAppleMO);
         insertCodelet(closestAppleDetector);
 
-        Codelet aj = new JewelDetector(env.c);
+        Codelet aj = new JewelDetector("JewelDetectorCodelet", env.c);
         aj.addInput(visionMO);
         aj.addOutput(knownJewelsMO);
         insertCodelet(aj);
 
-        Codelet closestJewelDetector = new ClosestJewelDetector(env.c, reachDistance);
+        Codelet closestJewelDetector = new ClosestJewelDetector("ClosestJewelDetectorCodelet", env.c, reachDistance);
         closestJewelDetector.addInput(knownJewelsMO);
         closestJewelDetector.addInput(innerSenseMO);
         closestJewelDetector.addOutput(closestJewelMO);
         insertCodelet(closestJewelDetector);
 
 
-        Codelet closestObstacleDetector = new ClosestObstacleDetector(env.c, brickDistance);
+        Codelet closestObstacleDetector = new ClosestObstacleDetector("ClosestObstacleDetectorCodelet", env.c, brickDistance);
         closestObstacleDetector.addInput(visionMO);
         closestObstacleDetector.addInput(innerSenseMO);
         closestObstacleDetector.addOutput(closestObstacleMO);
@@ -156,7 +156,6 @@ public class AgentMind extends Mind {
 
         goToClosestJewel.addOutput(legsMO);
 
-
         SubsumptionAction getJewel = new GetClosestJewel(reachDistance, env.c, subsumptionArchitecture);
         getJewel.addInput(closestJewelMO);
         getJewel.addInput(innerSenseMO);
@@ -166,12 +165,17 @@ public class AgentMind extends Mind {
         random.addInput(innerSenseMO);
         random.addOutput(handsMO);
 
-        SubsumptionAction avoidColisionObstacle = new AvoidColisionObstacle(subsumptionArchitecture, brickDistance);
+        SubsumptionAction avoidColisionObstacle = new AvoidColisionObstacle(env.c, subsumptionArchitecture, brickDistance);
         avoidColisionObstacle.addInput(closestObstacleMO);
         avoidColisionObstacle.addInput(knownJewelsMO);
         avoidColisionObstacle.addInput(innerSenseMO);
         avoidColisionObstacle.addOutput(legsMO);
         avoidColisionObstacle.addOutput(handsMO);
+
+
+        SubsumptionAction goToDeliverySpot = new GoToDeliverySpot(creatureBasicSpeed, env.c, subsumptionArchitecture);
+        goToDeliverySpot.addInput(innerSenseMO);
+        goToDeliverySpot.addOutput(legsMO);
 
 
         /*SubsumptionAction forage = new Forage(subsumptionArchitecture);
@@ -185,15 +189,22 @@ public class AgentMind extends Mind {
         layer.addAction(getJewel);
         layer.addAction(eatApple);
         layer.addAction(avoidColisionObstacle);
+        layer.addAction(goToDeliverySpot);
+
 
         subsumptionArchitecture.addSuppressedAction(random, goToClosestJewel);
         subsumptionArchitecture.addSuppressedAction(random, goToClosestApple);
-        //subsumptionArchitecture.addSuppressedAction(forage, avoidColisionObstacle);
+
         subsumptionArchitecture.addSuppressedAction(avoidColisionObstacle, goToClosestJewel);
         subsumptionArchitecture.addSuppressedAction(avoidColisionObstacle, goToClosestApple);
+        subsumptionArchitecture.addSuppressedAction(avoidColisionObstacle, goToDeliverySpot);
         subsumptionArchitecture.addInhibitedAction(avoidColisionObstacle, random);
+
         subsumptionArchitecture.addSuppressedAction(goToClosestApple, goToClosestJewel);
 
+        subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, goToClosestApple);
+        subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, goToClosestJewel);
+        subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, random);
 
         subsumptionArchitecture.addLayer(layer);
 

@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package br.unicamp.rctapp.codelets.perception;
+
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
 

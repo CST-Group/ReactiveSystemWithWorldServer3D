@@ -2,11 +2,14 @@ package br.unicamp.rctapp.codelets.perception;
 
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
-
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import ws3dproxy.model.Creature;
 import ws3dproxy.model.Thing;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Du
@@ -79,7 +82,6 @@ public class AppleDetector extends Codelet {
             known.removeAll(known);
         }
 
-
         List<Thing> hiddenThings = (List<Thing>) getHiddenObjectsMO().getI();
 
         for (Thing thing : hiddenThings) {
@@ -127,7 +129,5 @@ public class AppleDetector extends Codelet {
     public void setHiddenObjectsMO(MemoryObject hiddenObjectsMO) {
         this.hiddenObjectsMO = hiddenObjectsMO;
     }
-
 }//end class
-
 

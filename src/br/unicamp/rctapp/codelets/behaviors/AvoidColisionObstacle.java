@@ -10,6 +10,7 @@ import br.unicamp.cst.behavior.subsumption.SubsumptionArchitecture;
 import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.core.exceptions.CodeletActivationBoundsException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ import br.unicamp.rctapp.memory.CreatureInnerSense;
 import org.json.JSONException;
 import org.json.JSONObject;
 import ws3dproxy.model.Creature;
+import ws3dproxy.model.Leaflet;
 import ws3dproxy.model.Thing;
 
 /**
@@ -35,9 +37,10 @@ public class AvoidColisionObstacle extends SubsumptionAction {
     Thing closestObstacle;
     CreatureInnerSense cis;
 
-    public AvoidColisionObstacle(SubsumptionArchitecture subsumptionArchitecture, int reachDistance) {
+    public AvoidColisionObstacle(Creature creature, SubsumptionArchitecture subsumptionArchitecture, int reachDistance) {
         super(subsumptionArchitecture);
         this.reachDistance = reachDistance;
+        this.setCreature(creature);
     }
 
     @Override
@@ -103,7 +106,6 @@ public class AvoidColisionObstacle extends SubsumptionAction {
     public void act() {
         String obstacleName = "";
         closestObstacle = (Thing) closestObstacleMO.getI();
-        cis = (CreatureInnerSense) innerSenseMO.getI();
 
         //Find distance between closest apple and self
         //If closer than reachDistance, eat the apple
@@ -123,57 +125,98 @@ public class AvoidColisionObstacle extends SubsumptionAction {
 
                     e.printStackTrace();
                 }
-            } else {
+            } else if (closestObstacle.getName().contains("Jewel")) {
+                boolean exist = false;
 
-                if (closestObstacle.getName().contains("Jewel")) {
-                    List<Thing> jewels = (List<Thing>) knownJewelsMO.getI();
-                    if (!jewels.contains(closestObstacle)) {
-                        try {
-                            message.put("OBJECT", closestObstacle.getName());
-                            message.put("ACTION", "BURY");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        handsMO.setEvaluation(getActivation());
-                        handsMO.setI(message.toString());
-                        legsMO.setEvaluation(getActivation());
-                        legsMO.setI("");
-                    } else {
-                        try {
-                            message.put("OBJECT", closestObstacle.getName());
-                            message.put("ACTION", "PICKUP");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        handsMO.setEvaluation(getActivation());
-                        handsMO.setI(message.toString());
-                        legsMO.setEvaluation(getActivation());
-                        legsMO.setI("");
+                for (Leaflet leaflet : getCreature().getLeaflets()) {
+                    if (leaflet.ifInLeaflet(closestObstacle.getMaterial().getColorName())) {
+                        exist = true;
+                        break;
                     }
-                } else {
+                }
 
-
+                if (!exist) {
                     try {
                         message.put("OBJECT", closestObstacle.getName());
                         message.put("ACTION", "BURY");
+                        handsMO.setEvaluation(getActivation());
+                        handsMO.setI(message.toString());
+                        legsMO.setEvaluation(getActivation());
+                        legsMO.setI("");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-
-                    handsMO.setEvaluation(getActivation());
-                    handsMO.setI(message.toString());
-
-                    legsMO.setEvaluation(getActivation());
-                    legsMO.setI("");
-
+                } else {
+                    try {
+                        message.put("OBJECT", closestObstacle.getName());
+                        message.put("ACTION", "PICKUP");
+                        handsMO.setEvaluation(getActivation());
+                        handsMO.setI(message.toString());
+                        legsMO.setEvaluation(getActivation());
+                        legsMO.setI("");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } else if (closestObstacle.getName().contains("DeliverySpot")) {
+                List<Long> leafletCompleted = new ArrayList<>();
+
+                getCreature().getLeaflets().forEach(leaflet -> {
+                    if (leaflet.getSituation() == 1)
+                        leafletCompleted.add(leaflet.getID());
+                });
+
+                if (leafletCompleted.size() > 0) {
+                    try {
+                        message.put("OBJECT", obstacleName);
+                        message.put("ACTION", "DELIVERY");
+                        message.put("LEAFLETS", leafletCompleted);
+                        handsMO.setEvaluation(getActivation());
+                        handsMO.setI(message.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        message.put("OBJECT", obstacleName);
+                        message.put("ACTION", "AVOID");
+                        legsMO.setEvaluation(getActivation());
+                        legsMO.setI(message.toString());
+                        handsMO.setEvaluation(getActivation());
+                        handsMO.setI("");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            } else {
+                try {
+                    message.put("OBJECT", closestObstacle.getName());
+                    message.put("ACTION", "BURY");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                handsMO.setEvaluation(getActivation());
+                handsMO.setI(message.toString());
+                legsMO.setEvaluation(getActivation());
+                legsMO.setI("");
+
             }
+
         } else {
             legsMO.setEvaluation(getActivation());
             legsMO.setI("");
             handsMO.setEvaluation(getActivation());
             handsMO.setI("");
         }
+    }
+
+    public Creature getCreature() {
+        return creature;
+    }
+
+    public void setCreature(Creature creature) {
+        this.creature = creature;
     }
 }
