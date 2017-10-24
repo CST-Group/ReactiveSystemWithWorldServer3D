@@ -191,7 +191,6 @@ public class AgentMind extends Mind {
         layer.addAction(avoidColisionObstacle);
         layer.addAction(goToDeliverySpot);
 
-
         subsumptionArchitecture.addSuppressedAction(random, goToClosestJewel);
         subsumptionArchitecture.addSuppressedAction(random, goToClosestApple);
 
@@ -201,10 +200,10 @@ public class AgentMind extends Mind {
         subsumptionArchitecture.addInhibitedAction(avoidColisionObstacle, random);
 
         subsumptionArchitecture.addSuppressedAction(goToClosestApple, goToClosestJewel);
+        subsumptionArchitecture.addSuppressedAction(goToClosestApple, goToDeliverySpot);
 
-        subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, goToClosestApple);
         subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, goToClosestJewel);
-        subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, random);
+        subsumptionArchitecture.addSuppressedAction(goToDeliverySpot, goToClosestApple);
 
         subsumptionArchitecture.addLayer(layer);
 

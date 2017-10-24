@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.core.exceptions.CodeletActivationBoundsException;
 import br.unicamp.rctapp.memory.CreatureInnerSense;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import ws3dproxy.model.Creature;

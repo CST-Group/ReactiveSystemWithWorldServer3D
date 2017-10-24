@@ -107,7 +107,7 @@ public class SimulationController {
         reportEnergySpent(getTime());
         reportCreatureScore(getTime());
 
-        if((getTime() /60) == getDefaultTime()){
+        if((getTime() / 60) == getDefaultTime()){
             finalizeReport("Creature's Energy", "Time", "Energy", getResultEnergySpent(), getFileEnergySpent());
             finalizeReport("Creature's Score", "Time", "Score", getResultCreatureScore(), getFileCreatureScore());
             getT().cancel();
@@ -125,7 +125,6 @@ public class SimulationController {
             World.createJewel(random.nextInt(6), getR().nextInt(800), getR().nextInt(600));
             World.createJewel(random.nextInt(6), getR().nextInt(800), getR().nextInt(600));
             World.createJewel(random.nextInt(6), getR().nextInt(800), getR().nextInt(600));
-            World.createFood(random.nextInt(2), getR().nextInt(800), getR().nextInt(600));
             World.createFood(random.nextInt(2), getR().nextInt(800), getR().nextInt(600));
         } catch (Exception e) {
             e.printStackTrace();
