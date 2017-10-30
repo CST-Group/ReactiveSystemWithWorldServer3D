@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import br.unicamp.rctapp.memory.CreatureInnerSense;
+import br.unicamp.rctapp.support.SimulationController;
 import ws3dproxy.model.Thing;
 
 /**
@@ -227,6 +228,15 @@ public class AgentMind extends Mind {
 
         mv.StartTimer();
         mv.setVisible(true);*/
+
+        // Create and Populate SimulationController
+        SimulationController simulationController = new SimulationController("SimulationController");
+
+        simulationController.setCreatureInnerSenseMO(innerSenseMO);
+        simulationController.setCreature(env.c);
+        simulationController.setMind(this);
+        simulationController.StartTimer();
+        //=================================
 
 
         // Start Cognitive Cycle

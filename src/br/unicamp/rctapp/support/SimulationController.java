@@ -20,7 +20,6 @@
 package br.unicamp.rctapp.support;
 
 import br.unicamp.cst.core.entities.MemoryObject;
-import br.unicamp.cst.motivational.Drive;
 import br.unicamp.rctapp.application.AgentMind;
 import br.unicamp.rctapp.memory.CreatureInnerSense;
 import com.google.gson.Gson;
