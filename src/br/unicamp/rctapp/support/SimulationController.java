@@ -60,8 +60,6 @@ public class SimulationController {
     private List<Result> resultDrivesActivation;
     private List<Result> resultCreatureScore;
 
-
-
     public SimulationController(String name) {
         String timeLog = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
         setResultEnergySpent(new ArrayList<>());
@@ -112,6 +110,7 @@ public class SimulationController {
             getT().cancel();
             getT().purge();
             getAgentMind().shutDown();
+            System.exit(1);
         }
 
         setCounterToGenerateThings(getCounterToGenerateThings() + 1);
